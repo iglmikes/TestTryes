@@ -2,6 +2,9 @@ syntax = "proto3";
 
 option csharp_namespace = "GrpcBus.Core.Proto";
 
+
+package grpc_bus;
+
 service DataBusService {
   rpc EstablishDuplexConnection (stream ClientMessage) returns (stream ServerMessage);
 }
@@ -26,10 +29,12 @@ enum ClientCommand {
   PING = 0;
   SUBSCRIBE = 1;
   UNSUBSCRIBE = 2;
+  REQUEST_STATUS = 3;
 }
 
 enum ServerNotification {
   PONG = 0;
   CONNECTION_ESTABLISHED = 1;
   CONNECTION_LOST = 2;
+  SERVER_SHUTDOWN = 3;
 }

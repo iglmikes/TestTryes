@@ -2,6 +2,9 @@ syntax = "proto3";
 
 option csharp_namespace = "GrpcBus.Core.Proto";
 
+
+package grpc_bus;
+
 service DataBusService {
   rpc EstablishDuplexConnection (stream ClientMessage) returns (stream ServerMessage);
 }

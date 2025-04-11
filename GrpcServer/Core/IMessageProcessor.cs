@@ -7,6 +7,6 @@ namespace GrpcServer.Core
 {
     public interface IMessageProcessor
     {
-        Task ProcessClientMessage(ClientMessage message, IServerStreamWriter<ServerMessage> responseStream);
+        Task ProcessClientMessage(ClientMessage message, IServerStreamWriter<ServerMessage> responseStream, ServerCallContext context);
     }
 }
