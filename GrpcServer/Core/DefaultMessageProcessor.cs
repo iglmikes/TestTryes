@@ -70,11 +70,12 @@ namespace GrpcServer.Core
                 TextResponse = $"Server received at {DateTime.UtcNow}: {text}"
             });
 
-            // Широковещательное сообщение всем клиентам - пока не реализовано - мб в .proto над добавить?
-            //await _busService.BroadcastMessage(new ServerMessage
-            //{
-            //    TextResponse = $"User {context.Peer} sent: {text}"
-            //});
+           // //Широковещательное сообщение всем клиентам -пока не реализовано -мб в.proto над добавить?
+            
+           //await _busService.BroadcastMessage(new ServerMessage
+           //{
+           //    TextResponse = $"User {context.Peer} sent: {text}"
+           //});
         }
 
         private async Task HandleBinaryData(  byte[] data,  IServerStreamWriter<ServerMessage> responseStream,  ServerCallContext context)
