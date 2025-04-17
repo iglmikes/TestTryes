@@ -13,6 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Abstractions\DBAbstractions.csproj" />
+    <ProjectReference Include="..\EFMySqlDataProvider\EFMySqlDataProvider.csproj" />
+    <ProjectReference Include="..\EFPostgreDataProvider\EFPostgreDataProvider.csproj" />
     <ProjectReference Include="..\GrpcServer\GrpcServer.csproj" />
   </ItemGroup>
 

@@ -1,8 +1,13 @@
+using DBAbstractions.Interfaces;
+using EFPostgreDataProvider.Core;
+using EFMySqlDataProvider.Core;
 using GrpcBus.Core;
 using GrpcServer.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +42,28 @@ builder.Services.AddGrpc(options =>
 });
 // Регистрируем наш обработчик сообщений
 builder.Services.AddSingleton<IMessageProcessor, DefaultMessageProcessor>();
+
+// Получаем конфигурацию
+var configuration = builder.Configuration;
+
+var hz = configuration["Database:Type"];
+
+
+IDatabaseProvider databaseProvider = configuration["Database:Type"] switch
+{
+    "MySql" => new MySqlProvider(),
+    "Postgre" => new PostgreProvider(),
+    null => throw new Exception("not founded settings for a database provider"),
+    _ => throw new Exception("Unsupported database provider")
+};
+
+// Конфигурируем сервисы
+databaseProvider.ConfigureDbContext(
+builder.Services,
+    configuration.GetConnectionString(configuration["Database:Type"]));
+
+databaseProvider.RegisterUnitOfWork(builder.Services);
+//databaseProvider.ConfigureRepositories(builder.Services); // Опционально - not ready yet
 
 
 
