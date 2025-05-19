@@ -10,10 +10,11 @@ using System.Threading.Channels;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using GrpcClient.Support;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GrpcClient.Core
 {
-    public class GrpcBusClient : IDisposable
+    public class GrpcBusClient :  IGrpcBusClient
     {
         private readonly ILogger<GrpcBusClient> _logger;
         private readonly GrpcBusClientOptions _options;
@@ -29,7 +30,7 @@ namespace GrpcClient.Core
         public event Action<Exception>? OnError;
         public event Action? OnConnected;
         public event Action? OnDisconnected;
-
+        public bool IsConnected { get; private set; }
         public GrpcBusClient(ILogger<GrpcBusClient> logger)
         {
             _logger = logger;
@@ -41,7 +42,18 @@ namespace GrpcClient.Core
             _options = options;
         }
 
-
+        public GrpcBusClient(string serverUrl)
+        {
+            _channel = GrpcChannel.ForAddress(serverUrl);
+            _client = new DataBusService.DataBusServiceClient(_channel);
+        }
+        public GrpcBusClient(string serverUrl, ILogger<GrpcBusClient> logger, GrpcBusClientOptions options)
+        {
+            _logger = logger;
+            _options = options;
+            _channel = GrpcChannel.ForAddress(serverUrl);
+            _client = new DataBusService.DataBusServiceClient(_channel);
+        }
         public async Task ConnectAsync(string serverUrl, bool useHttps = true)
         {
             try
@@ -89,6 +101,46 @@ namespace GrpcClient.Core
                 OnError?.Invoke(ex);
                 throw;
             }
+        }
+
+
+        public async Task ConnectAsync(CancellationToken ct = default)
+        {
+            _duplexStream = _client.EstablishDuplexConnection(cancellationToken: ct);
+            IsConnected = true;
+
+            // Запуск фоновой задачи для чтения сообщений
+            _ = Task.Run(async () =>
+            {
+                await foreach (var response in _duplexStream.ResponseStream.ReadAllAsync(ct))
+                {
+                    OnMessageReceived?.Invoke(response);
+                }
+            }, ct);
+        }
+
+
+        public async Task SendTextAsync(string text, CancellationToken ct = default)
+        {
+            Status CurrentStatus = new Status(StatusCode.NotFound, "") ;
+            
+            if (_duplexStream != null )
+             CurrentStatus = _duplexStream.GetStatus();
+
+            if (CurrentStatus.StatusCode == StatusCode.Unavailable && _duplexStream!=null)
+            {
+
+
+            }
+
+
+            if (_duplexStream == null || CurrentStatus.StatusCode!= StatusCode.OK )
+                ConnectAsync( ct );
+
+            await _duplexStream!.RequestStream.WriteAsync(new ClientMessage
+            {
+                TextMessage = text
+            }, ct);
         }
 
         public async Task DisconnectAsync()
@@ -225,6 +277,26 @@ namespace GrpcClient.Core
             _channel?.Dispose();
             _cts.Dispose();
             GC.SuppressFinalize(this);
+        }
+
+        public Task SendBinaryAsync(byte[] data, CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendCommandAsync(ClientCommand command, CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<ServerMessage> GetResponseStream(CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

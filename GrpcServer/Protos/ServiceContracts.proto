@@ -14,6 +14,19 @@ message ClientMessage {
     string text_message = 1;
     bytes binary_data = 2;
     ClientCommand command = 3;
+
+    CommonCommand common_command = 4;
+    User user = 5;// ласс дл€ примера - можно любой рабочий класс добавить
+    UsersCar users_car = 6;
+    StatusMessage status_message = 7;
+
+    // ћожно добавл€ть другие типы
+    ImageData image_data = 8;
+    DocumentData document_data = 9;
+    AudioData audio_data = 10;
+
+    bytes generic_binary = 11;  // ”ниверсальный вариант
+
   }
 }
 
@@ -22,19 +35,114 @@ message ServerMessage {
     string text_response = 1;
     bytes binary_response = 2;
     ServerNotification notification = 3;
+
+    CommonCommand common_command = 4;
+    User user = 5;// ласс дл€ примера - можно любой рабочий класс добавить
+    UsersCar users_car = 6;
+    StatusMessage status_message = 7;
+
+    // ћожно добавл€ть другие типы
+    ImageData image_data = 8;
+    DocumentData document_data = 9;
+    AudioData audio_data = 10;
+
+    bytes generic_binary = 11;  // ”ниверсальный вариант
+
+
   }
 }
+
+message CommonCommand {
+  ComType com_type = 1;
+  string userid = 2;
+  uint64 dataid = 3;
+  string datanamesearch = 4;
+  DataType datatype = 5;
+}
+
+  enum ComType {
+  UPSERT = 0;
+  DELETE = 1;
+  GET = 2;
+}
+
+//если запрашиваем данные - тут указываем возможные типы данных дл€ запроса
+  enum DataType {
+  IMG = 0;
+  DOC = 1;
+  AUD = 2;
+}
+
+message User {
+  string id = 1;
+  uint64 age = 2;
+  string sex = 3;
+  string name = 4;
+}
+
+message UsersCar {
+  string car_id = 1;
+  string model = 2;
+  uint32 year = 3;
+  string user_id = 4;
+}
+
 
 enum ClientCommand {
   PING = 0;
   SUBSCRIBE = 1;
   UNSUBSCRIBE = 2;
-  REQUEST_STATUS = 3;
 }
 
 enum ServerNotification {
   PONG = 0;
   CONNECTION_ESTABLISHED = 1;
   CONNECTION_LOST = 2;
-  SERVER_SHUTDOWN = 3;
+}
+
+message ImageData {
+  bytes payload = 1;
+  ImageFormat format = 2;
+  int32 width = 3;
+  int32 height = 4;
+}
+
+message DocumentData {
+  bytes payload = 1;
+  DocumentType type = 2;
+  string file_name = 3;
+}
+
+message AudioData {
+  bytes payload = 1;
+  AudioCodec codec = 2;
+  double duration_seconds = 3;
+}
+
+
+enum ImageFormat {
+  JPEG = 0;
+  PNG = 1;
+  WEBP = 2;
+}
+
+enum DocumentType {
+  PDF = 0;
+  DOCX = 1;
+  XLSX = 2;
+}
+
+enum AudioCodec {
+  MP3 = 0;
+  AAC = 1;
+  OPUS = 2;
+}
+
+
+
+message StatusMessage {
+  string id = 1;
+  string code = 2;
+  int64 timestamp = 3;
+  string message = 4;
 }

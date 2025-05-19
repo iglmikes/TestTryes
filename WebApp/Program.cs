@@ -46,7 +46,7 @@ builder.Services.AddSingleton<IMessageProcessor, DefaultMessageProcessor>();
 // Получаем конфигурацию
 var configuration = builder.Configuration;
 
-var hz = configuration["Database:Type"];
+//var hz = configuration["Database:Type"];
 
 
 IDatabaseProvider databaseProvider = configuration["Database:Type"] switch
