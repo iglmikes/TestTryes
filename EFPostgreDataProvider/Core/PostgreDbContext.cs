@@ -24,6 +24,7 @@ namespace EFPostgreDataProvider.Core
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         // Можно где то отдельно доописать схему всей БД и при запуске валидировать и соотсношать(?)
 
@@ -47,7 +48,19 @@ namespace EFPostgreDataProvider.Core
                 entity.Property(u => u.UpdatedAt)
                     .ValueGeneratedOnUpdate();
             });
-        }
+
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.ToTable("orders");
+
+
+
+
+
+            });
+            
+            
+            }
 
     }
 }
