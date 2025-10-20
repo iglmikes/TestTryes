@@ -58,9 +58,11 @@ IDatabaseProvider databaseProvider = configuration["Database:Type"] switch
 };
 
 // Конфигурируем сервисы
-databaseProvider.ConfigureDbContext(
-builder.Services,
-    configuration.GetConnectionString(configuration["Database:Type"]));
+databaseProvider.ConfigureDbContext
+    (
+    builder.Services,
+    configuration.GetConnectionString(configuration["Database:Type"])
+    );
 
 databaseProvider.RegisterUnitOfWork(builder.Services);
 //databaseProvider.ConfigureRepositories(builder.Services); // Опционально - not ready yet
@@ -79,6 +81,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 
 app.UseRouting();
 

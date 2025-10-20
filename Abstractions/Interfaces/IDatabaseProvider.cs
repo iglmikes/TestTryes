@@ -14,5 +14,7 @@ namespace DBAbstractions.Interfaces
     {
         void ConfigureDbContext(IServiceCollection services, string connectionString);
         void RegisterUnitOfWork(IServiceCollection services);
+
+        //conf repositories????
     }
 }

@@ -6,12 +6,10 @@ namespace Entities
     {
 
         public int Id { get; set; }
-
+        public decimal Amount { get; set; }
+        public DateTime OrderedAt { get; set; }
 
         public int UserId { get; set; }
-        
-
-        public string Email { get; set; }
-        public object User { get; set; }
+        public User User { get; set; }
     }
 }
